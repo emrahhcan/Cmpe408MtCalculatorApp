@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Cmpe408MtCalculatorApp</string>
-    <string name="operations">Operations</string>
-    <string name="result">Result</string>
+    <string name="operations">0</string>
+    <string name="result">0</string>
     <string name="mod">%</string>
     <string name="clear_all">CE</string>
     <string name="clear">C</string>

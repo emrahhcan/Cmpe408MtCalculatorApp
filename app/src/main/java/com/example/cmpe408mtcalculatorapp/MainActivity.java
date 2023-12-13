@@ -7,10 +7,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static int MAX_ALLOWED_OPERATION_LENGTH = 4;
 
-    private TextView operationsTv, resultTv;
+    private TextView operationsTv;
+    private TextView resultTv;
     private Button modBtn, clearAllBtn, clearBtn, deleteBtn,
             oneOverXBtn, squareBtn, squareRootBtn, divisionBtn,
             sevenBtn, eightBtn, nineBtn, multiplyBtn,
@@ -57,10 +61,95 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn.setOnClickListener(this);
     }
 
+    void checkIfOperationIsEmpty(String operations) {
+        if (operations.isEmpty()) {
+            return;
+        }
+    }
+
     @Override
     public void onClick(View v) {
         Button button = (Button) v;
         String buttonText = button.getText().toString();
-        operationsTv.setText(buttonText);
+
+        // Concat the operations in textview
+        String operations = operationsTv.getText().toString();
+
+        if (buttonText.equals("C") || buttonText.equals("CE")) {
+            operationsTv.setText("");
+            resultTv.setText("");
+            return;
+        }
+
+        if (buttonText.equals("=")) {
+            // checkIfOperationIsEmpty(operations);
+            operationsTv.setText(resultTv.getText());
+            return;
+        }
+
+        if (buttonText.equals("D")) {
+            // checkIfOperationIsEmpty(operations);
+            operations = operations.substring(0, operations.length() - 1);
+        } else {
+            operationsTv.setText("");
+            operations = operations + buttonText;
+        }
+
+        operationsTv.setText(operations);
+
+        String finalResult = getResult(operations);
+
+        if(!finalResult.equals("something went wrong")){
+            resultTv.setText(finalResult);
+        }
+
+
+//        // If the operations is empty, then only allow the user to enter numbers
+//        if (operations.isEmpty()) {
+//            if (buttonText.equals("0")) {
+//                return;
+//            }
+//            if (buttonText.equals(".")) {
+//                operationsTv.setText("0.");
+//                return;
+//            }
+//        }
+//
+//        // If the operations is not empty, then only allow the user to enter numbers and operators
+//        if (!operations.isEmpty()) {
+//            if (buttonText.equals("0")) {
+//                operationsTv.setText(operations + buttonText);
+//                return;
+//            }
+//            if (buttonText.equals(".")) {
+//                if (operations.contains(".")) {
+//                    return;
+//                }
+//                operationsTv.setText(operations + buttonText);
+//                return;
+//            }
+//            if (buttonText.equals("+") || buttonText.equals("-") || buttonText.equals("x") || buttonText.equals("÷")) {
+//                if (operations.length() >= MAX_ALLOWED_OPERATION_LENGTH) {
+//                    return;
+//                }
+//                operationsTv.setText(operations + buttonText);
+//                return;
+//            }
+//        }
+    }
+
+    String getResult(String data){
+        try{
+            Context context  = Context.enter();
+            context.setOptimizationLevel(-1);
+            Scriptable scriptable = context.initStandardObjects();
+            String finalResult =  context.evaluateString(scriptable,data,"Javascript",1,null).toString();
+            if(finalResult.endsWith(".0")){
+                finalResult = finalResult.replace(".0","");
+            }
+            return finalResult;
+        }catch (Exception e){
+            return "something went wrong";
+        }
     }
 }
