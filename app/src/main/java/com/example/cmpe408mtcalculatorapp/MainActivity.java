@@ -99,56 +99,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         String finalResult = getResult(operations);
 
-        if(!finalResult.equals("something went wrong")){
+        if (!finalResult.equals("something went wrong")) {
             resultTv.setText(finalResult);
         }
-
-
-//        // If the operations is empty, then only allow the user to enter numbers
-//        if (operations.isEmpty()) {
-//            if (buttonText.equals("0")) {
-//                return;
-//            }
-//            if (buttonText.equals(".")) {
-//                operationsTv.setText("0.");
-//                return;
-//            }
-//        }
-//
-//        // If the operations is not empty, then only allow the user to enter numbers and operators
-//        if (!operations.isEmpty()) {
-//            if (buttonText.equals("0")) {
-//                operationsTv.setText(operations + buttonText);
-//                return;
-//            }
-//            if (buttonText.equals(".")) {
-//                if (operations.contains(".")) {
-//                    return;
-//                }
-//                operationsTv.setText(operations + buttonText);
-//                return;
-//            }
-//            if (buttonText.equals("+") || buttonText.equals("-") || buttonText.equals("x") || buttonText.equals("÷")) {
-//                if (operations.length() >= MAX_ALLOWED_OPERATION_LENGTH) {
-//                    return;
-//                }
-//                operationsTv.setText(operations + buttonText);
-//                return;
-//            }
-//        }
     }
 
-    String getResult(String data){
-        try{
-            Context context  = Context.enter();
+    String getResult(String data) {
+        try {
+            Context context = Context.enter();
             context.setOptimizationLevel(-1);
             Scriptable scriptable = context.initStandardObjects();
-            String finalResult =  context.evaluateString(scriptable,data,"Javascript",1,null).toString();
-            if(finalResult.endsWith(".0")){
-                finalResult = finalResult.replace(".0","");
+            String finalResult = context.evaluateString(scriptable, data, "Javascript", 1, null).toString();
+            if (finalResult.endsWith(".0")) {
+                finalResult = finalResult.replace(".0", "");
             }
             return finalResult;
-        }catch (Exception e){
+        } catch (Exception e) {
             return "something went wrong";
         }
     }
