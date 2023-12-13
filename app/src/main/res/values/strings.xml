@@ -7,10 +7,10 @@
     <string name="clear">C</string>
     <string name="delete">D</string>
     <string name="one_over_x">1/x</string>
-    <string name="square">x^2</string>
+    <string name="square">x²</string>
     <string name="square_root">√x</string>
     <string name="division">/</string>
-    <string name="multiply">x</string>
+    <string name="multiply">*</string>
     <string name="subtraction">-</string>
     <string name="addition">+</string>
     <string name="equals">=</string>

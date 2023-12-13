@@ -97,14 +97,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         operationsTv.setText(operations);
 
-        String finalResult = getResult(operations);
+        String finalResult = getResult(operations, buttonText);
 
         if (!finalResult.equals("something went wrong")) {
             resultTv.setText(finalResult);
         }
     }
 
-    String getResult(String data) {
+    String getResult(String data, String button) {
         try {
             Context context = Context.enter();
             context.setOptimizationLevel(-1);
