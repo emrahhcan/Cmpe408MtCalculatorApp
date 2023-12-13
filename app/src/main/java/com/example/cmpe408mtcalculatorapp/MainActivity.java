@@ -6,21 +6,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private static int MAX_ALLOWED_OPERATION_LENGTH = 4;
 
     private TextView operationsTv;
     private TextView resultTv;
-    private Button modBtn, clearAllBtn, clearBtn, deleteBtn,
-            oneOverXBtn, squareBtn, squareRootBtn, divisionBtn,
-            sevenBtn, eightBtn, nineBtn, multiplyBtn,
-            fourBtn, fiveBtn, sixBtn, subtractionBtn,
-            oneBtn, twoBtn, threeBtn, additionBtn,
-            plusMinusBtn, zeroBtn, decimalBtn, equalsBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,40 +24,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         operationsTv = findViewById(R.id.operations);
         resultTv = findViewById(R.id.result);
 
-        assignButtonIds(modBtn, R.id.modBtn);
-        assignButtonIds(clearAllBtn, R.id.clearAllBtn);
-        assignButtonIds(clearBtn, R.id.clearBtn);
-        assignButtonIds(deleteBtn, R.id.deleteBtn);
-        assignButtonIds(oneOverXBtn, R.id.oneOverXBtn);
-        assignButtonIds(squareBtn, R.id.squareBtn);
-        assignButtonIds(squareRootBtn, R.id.squareRootBtn);
-        assignButtonIds(divisionBtn, R.id.divisionBtn);
-        assignButtonIds(sevenBtn, R.id.sevenBtn);
-        assignButtonIds(eightBtn, R.id.eightBtn);
-        assignButtonIds(nineBtn, R.id.nineBtn);
-        assignButtonIds(multiplyBtn, R.id.multiplyBtn);
-        assignButtonIds(fourBtn, R.id.fourBtn);
-        assignButtonIds(fiveBtn, R.id.fiveBtn);
-        assignButtonIds(sixBtn, R.id.sixBtn);
-        assignButtonIds(subtractionBtn, R.id.subtractionBtn);
-        assignButtonIds(oneBtn, R.id.oneBtn);
-        assignButtonIds(twoBtn, R.id.twoBtn);
-        assignButtonIds(threeBtn, R.id.threeBtn);
-        assignButtonIds(additionBtn, R.id.additionBtn);
-        assignButtonIds(plusMinusBtn, R.id.plusMinusBtn);
-        assignButtonIds(zeroBtn, R.id.zeroBtn);
-        assignButtonIds(decimalBtn, R.id.decimalBtn);
-        assignButtonIds(equalsBtn, R.id.equalsBtn);
+        // Initialize buttons and set click listeners
+        initButton(R.id.modBtn);
+        initButton(R.id.clearAllBtn);
+        initButton(R.id.clearBtn);
+        initButton(R.id.deleteBtn);
+        initButton(R.id.oneOverXBtn);
+        initButton(R.id.squareBtn);
+        initButton(R.id.squareRootBtn);
+        initButton(R.id.divisionBtn);
+        initButton(R.id.sevenBtn);
+        initButton(R.id.eightBtn);
+        initButton(R.id.nineBtn);
+        initButton(R.id.multiplyBtn);
+        initButton(R.id.fourBtn);
+        initButton(R.id.fiveBtn);
+        initButton(R.id.sixBtn);
+        initButton(R.id.subtractionBtn);
+        initButton(R.id.oneBtn);
+        initButton(R.id.twoBtn);
+        initButton(R.id.threeBtn);
+        initButton(R.id.additionBtn);
+        initButton(R.id.plusMinusBtn);
+        initButton(R.id.zeroBtn);
+        initButton(R.id.decimalBtn);
+        initButton(R.id.equalsBtn);
     }
 
-    void assignButtonIds(Button btn, int id) {
-        btn = findViewById(id);
-        btn.setOnClickListener(this);
+    private void initButton(int id) {
+        Button button = findViewById(id);
+        button.setOnClickListener(this);
     }
 
-    void checkIfOperationIsEmpty(String operations) {
+    private void showToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void checkIfOperationIsEmpty(String operations) {
         if (operations.isEmpty()) {
-            return;
+            showToast("Please enter a number first");
         }
     }
 
@@ -72,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button button = (Button) v;
         String buttonText = button.getText().toString();
 
-        // Concat the operations in textview
+        // Concatenate the operations in the TextView
         String operations = operationsTv.getText().toString();
 
         if (buttonText.equals("C") || buttonText.equals("CE")) {
@@ -82,40 +81,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         if (buttonText.equals("=")) {
-            // checkIfOperationIsEmpty(operations);
+            checkIfOperationIsEmpty(operations);
             operationsTv.setText(resultTv.getText());
             return;
         }
 
         if (buttonText.equals("D")) {
-            // checkIfOperationIsEmpty(operations);
-            operations = operations.substring(0, operations.length() - 1);
+            if (!operations.isEmpty()) {
+                operations = operations.substring(0, operations.length() - 1);
+            }
+        } else if (buttonText.equals("1/x") || buttonText.equals("x²") || buttonText.equals("√x")) {
+            operations = getResult(operations, buttonText);
         } else {
             operationsTv.setText("");
-            operations = operations + buttonText;
+            operations += buttonText;
         }
 
         operationsTv.setText(operations);
 
         String finalResult = getResult(operations, buttonText);
 
-        if (!finalResult.equals("something went wrong")) {
+        if (!finalResult.equals("error")) {
             resultTv.setText(finalResult);
         }
     }
 
-    String getResult(String data, String button) {
+    private String getResult(String data, String button) {
         try {
-            Context context = Context.enter();
-            context.setOptimizationLevel(-1);
-            Scriptable scriptable = context.initStandardObjects();
-            String finalResult = context.evaluateString(scriptable, data, "Javascript", 1, null).toString();
-            if (finalResult.endsWith(".0")) {
-                finalResult = finalResult.replace(".0", "");
+            String result;
+            if (button.equals("1/x")) {
+                result = String.valueOf(1 / Double.parseDouble(data));
+            } else if (button.equals("x²")) {
+                result = String.valueOf(Double.parseDouble(data) * Double.parseDouble(data));
+            } else if (button.equals("√x")) {
+                result = String.valueOf(Math.pow(Double.parseDouble(data), 0.5));
+            } else {
+                Context context = Context.enter();
+                context.setOptimizationLevel(-1);
+                Scriptable scriptable = context.initStandardObjects();
+                result = context.evaluateString(scriptable, data, "Javascript", 1, null).toString();
+                if (result.endsWith(".0")) {
+                    result = result.replace(".0", "");
+                }
             }
-            return finalResult;
+            return result;
+        } catch (ArithmeticException e) {
+            showToast("Error: " + e.getMessage());
+            return "error";
         } catch (Exception e) {
-            return "something went wrong";
+            return "error";
         }
     }
 }
